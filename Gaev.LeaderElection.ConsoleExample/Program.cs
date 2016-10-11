@@ -12,6 +12,7 @@ namespace Gaev.LeaderElection.ConsoleExample
             var node = Guid.NewGuid().ToString();
 
             using (var election = new MsSql.LeaderElection(connectionString))
+            //using (var election = new Mutex.LeaderElection())
             {
                 election.BecomeLeader(web, node, leader =>
                 {

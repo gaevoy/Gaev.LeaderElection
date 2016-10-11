@@ -2,9 +2,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Gaev.LeaderElection.MsSql
+namespace Gaev.LeaderElection
 {
-    public class DisposableTask : IDisposable
+    internal class DisposableTask : IDisposable
     {
         private readonly Task _task;
         private readonly CancellationTokenSource _cancellationToken;

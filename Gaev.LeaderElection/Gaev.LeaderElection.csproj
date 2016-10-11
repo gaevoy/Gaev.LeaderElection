@@ -37,13 +37,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ILeaderElection.cs" />
-    <Compile Include="MsSql\DisposableTask.cs" />
+    <Compile Include="DisposableTask.cs" />
     <Compile Include="MsSql\ILeaderRepository.cs" />
     <Compile Include="MsSql\LeaderDto.cs" />
     <Compile Include="MsSql\LeaderRepository.cs" />
     <Compile Include="Leader.cs" />
     <Compile Include="MsSql\LeaderElection.cs" />
     <Compile Include="MsSql\RetryAwareLeaderRepository.cs" />
+    <Compile Include="Mutex\LeaderElection.cs" />
+    <Compile Include="Mutex\WaitHandleExt.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
