@@ -1,0 +1,1 @@
+﻿DELETE FROM Leaders WHERE app = @app AND node = @node
