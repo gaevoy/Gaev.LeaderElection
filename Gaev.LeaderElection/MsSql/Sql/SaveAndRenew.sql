@@ -12,4 +12,4 @@ ON (dst.app = src.app AND (dst.node = src.node OR dst.expired < GETUTCDATE()))
 BEGIN CATCH
 END CATCH
 
-SELECT * FROM Leaders WHERE app = @app
+SELECT node FROM Leaders WHERE app = @app

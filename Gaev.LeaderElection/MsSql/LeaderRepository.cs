@@ -18,31 +18,30 @@ namespace Gaev.LeaderElection.MsSql
         {
             _connectionString = connectionString;
         }
-        
-        public async Task<LeaderDto> SaveAndRenewAsync(LeaderDto leader, int renewPeriodMilliseconds)
+
+        public async Task<LeaderDto> SaveAndRenewAsync(LeaderDto leader, int expirationPeriodMilliseconds)
         {
             using (var con = new SqlConnection(_connectionString))
             {
                 await con.OpenAsync();
                 await EnsureTableCreated(con);
                 SqlCommand cmd = con.CreateCommand();
+                cmd.CommandTimeout = 1;
                 cmd.CommandText = SaveAndRenewQuery;
                 AddParameter(cmd, "app", leader.App);
                 AddParameter(cmd, "node", leader.Node);
-                AddParameter(cmd, "expired", leader.ExpiredAt == default(DateTimeOffset) ? (DateTimeOffset?)null : leader.ExpiredAt);
-                AddParameter(cmd, "renewperiod", renewPeriodMilliseconds);
+                AddParameter(cmd, "renewperiod", expirationPeriodMilliseconds);
                 var reader = await cmd.ExecuteReaderAsync();
                 using (reader)
                     while (reader.Read())
                     {
                         leader.Node = (string)reader["node"];
-                        leader.ExpiredAt = (DateTime)reader["expired"];
                         return leader;
                     }
             }
-            return null;
+            return default(LeaderDto);
         }
-        
+
         public async Task RemoveAsync(LeaderDto leader)
         {
             using (var con = new SqlConnection(_connectionString))
@@ -50,17 +49,19 @@ namespace Gaev.LeaderElection.MsSql
                 await con.OpenAsync();
                 await EnsureTableCreated(con);
                 SqlCommand cmd = con.CreateCommand();
+                cmd.CommandTimeout = 1;
                 cmd.CommandText = RemoveQuery;
                 AddParameter(cmd, "app", leader.App);
                 AddParameter(cmd, "node", leader.Node);
                 await cmd.ExecuteNonQueryAsync();
             }
         }
-        
+
         private async Task EnsureTableCreated(SqlConnection con)
         {
             if (_isTableCreated) return;
             SqlCommand cmd = con.CreateCommand();
+            cmd.CommandTimeout = 1;
             cmd.CommandText = EnsureTableCreatedQuery;
             await cmd.ExecuteNonQueryAsync();
             _isTableCreated = true;
@@ -85,15 +86,8 @@ namespace Gaev.LeaderElection.MsSql
             }
             else if (value is string)
                 parameter.DbType = DbType.String;
-            else if (value is DateTimeOffset)
-            {
-                value = ((DateTimeOffset)value).DateTime;
-                parameter.DbType = DbType.DateTime;
-            }
             else if (value is Int32)
-            {
                 parameter.DbType = DbType.Int32;
-            }
             else
                 throw new NotImplementedException();
             parameter.Value = value ?? DBNull.Value;

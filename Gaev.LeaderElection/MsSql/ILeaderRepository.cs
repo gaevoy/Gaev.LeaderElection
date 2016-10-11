@@ -5,6 +5,6 @@ namespace Gaev.LeaderElection.MsSql
     public interface ILeaderRepository
     {
         Task RemoveAsync(LeaderDto leader);
-        Task<LeaderDto> SaveAndRenewAsync(LeaderDto leader, int renewPeriodMilliseconds);
+        Task<LeaderDto> SaveAndRenewAsync(LeaderDto leader, int expirationPeriodMilliseconds);
     }
 }

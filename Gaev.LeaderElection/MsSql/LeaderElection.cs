@@ -8,12 +8,14 @@ namespace Gaev.LeaderElection.MsSql
     public class LeaderElection : ILeaderElection
     {
         private readonly int _renewPeriodMilliseconds;
+        private readonly int _expirationPeriodMilliseconds;
         private readonly ILeaderRepository _leaderRepository;
         private readonly List<IDisposable> _tasks = new List<IDisposable>();
 
-        public LeaderElection(string connectionString, int renewPeriodMilliseconds = 500)
+        public LeaderElection(string connectionString, int renewPeriodMilliseconds = 500, int expirationPeriodMilliseconds = 1500)
         {
             _renewPeriodMilliseconds = renewPeriodMilliseconds;
+            _expirationPeriodMilliseconds = expirationPeriodMilliseconds;
             _leaderRepository = new RetryAwareLeaderRepository(new LeaderRepository(connectionString));
         }
 
@@ -44,7 +46,7 @@ namespace Gaev.LeaderElection.MsSql
                 try
                 {
                     leader.Node = node;
-                    leader = await _leaderRepository.SaveAndRenewAsync(leader, _renewPeriodMilliseconds * 2);
+                    leader = await _leaderRepository.SaveAndRenewAsync(leader, _expirationPeriodMilliseconds);
                 }
                 catch (Exception)
                 {

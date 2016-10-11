@@ -19,9 +19,9 @@ namespace Gaev.LeaderElection.MsSql
             return RetryAsync(async () => await _underlying.RemoveAsync(leader));
         }
 
-        public Task<LeaderDto> SaveAndRenewAsync(LeaderDto leader, int renewPeriodMilliseconds)
+        public Task<LeaderDto> SaveAndRenewAsync(LeaderDto leader, int expirationPeriodMilliseconds)
         {
-            return RetryAsync(async () => await _underlying.SaveAndRenewAsync(leader, renewPeriodMilliseconds));
+            return RetryAsync(async () => await _underlying.SaveAndRenewAsync(leader, expirationPeriodMilliseconds));
         }
 
         private async Task<T> RetryAsync<T>(Func<Task<T>> act)
