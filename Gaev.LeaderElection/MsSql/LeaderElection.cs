@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Gaev.LeaderElection.Utils;
 
 namespace Gaev.LeaderElection.MsSql
 {
+    /// <summary>
+    /// MsSql-based leader election can be used across multiple computers and different networks, use globally accessible Sql Server instance e.g. Sql Azure
+    /// </summary>
     public class LeaderElection : ILeaderElection
     {
         private readonly int _renewPeriodMilliseconds;
@@ -58,20 +62,9 @@ namespace Gaev.LeaderElection.MsSql
                     prevLeaderNode = leader.Node;
                     onLeaderChanged(new Leader { App = app, Node = leader.Node, AmILeader = node == leader.Node });
                 }
-                try
+                if (await TaskExt.Delay(_renewPeriodMilliseconds, cancellationToken))
                 {
-                    await Task.Delay(_renewPeriodMilliseconds, cancellationToken);
-                }
-                catch (OperationCanceledException)
-                {
-                    try
-                    {
-                        await _leaderRepository.RemoveAsync(leader);
-                    }
-                    catch (Exception)
-                    {
-                        // Ignore it
-                    }
+                    await TaskExt.RunAndIgnoreException(() => _leaderRepository.RemoveAsync(leader));
                     return;
                 }
             }

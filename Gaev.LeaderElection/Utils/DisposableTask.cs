@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Gaev.LeaderElection
+namespace Gaev.LeaderElection.Utils
 {
     internal class DisposableTask : IDisposable
     {

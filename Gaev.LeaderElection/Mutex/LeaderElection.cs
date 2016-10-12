@@ -4,9 +4,13 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
+using Gaev.LeaderElection.Utils;
 
 namespace Gaev.LeaderElection.Mutex
 {
+    /// <summary>
+    /// Mutex-based leader election can be used only within same operating system, use it for test purpose only
+    /// </summary>
     public class LeaderElection : ILeaderElection
     {
         private readonly List<IDisposable> _tasks = new List<IDisposable>();
