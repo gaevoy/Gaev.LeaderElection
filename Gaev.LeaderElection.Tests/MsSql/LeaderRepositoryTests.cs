@@ -83,6 +83,6 @@ namespace Gaev.LeaderElection.Tests.MsSql
             Assert.AreEqual("2", leader2.Node);
         }
 
-        private static string ConnectionString => ConfigurationManager.ConnectionStrings["Main"].ConnectionString;
+        private static string ConnectionString => ConfigurationManager.ConnectionStrings["Sql"].ConnectionString;
     }
 }

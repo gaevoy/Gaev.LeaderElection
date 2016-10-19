@@ -48,7 +48,6 @@
     <Compile Include="Utils\NetworkConnection.cs" />
     <Compile Include="LeaderElectionTests.cs" />
     <Compile Include="MsSql\LeaderRepositoryTests.cs" />
-    <Compile Include="MsSql\LeaderConnectionTests.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
