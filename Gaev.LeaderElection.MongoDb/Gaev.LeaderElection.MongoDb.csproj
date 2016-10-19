@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{83DC5156-1D2C-4C33-BA34-66739B38D5B4}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{8DDCA610-20ED-4F70-BD73-C42131BA5612}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Gaev.LeaderElection.Tests</RootNamespace>
-    <AssemblyName>Gaev.LeaderElection.Tests</AssemblyName>
+    <RootNamespace>Gaev.LeaderElection.MongoDb</RootNamespace>
+    <AssemblyName>Gaev.LeaderElection.MongoDb</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -29,41 +29,39 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>Gaev.LeaderElection.Tests.Program</StartupObject>
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=3.5.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.3.5.0\lib\net45\nunit.framework.dll</HintPath>
+    <Reference Include="MongoDB.Bson, Version=2.2.4.26, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MongoDB.Bson.2.2.4\lib\net45\MongoDB.Bson.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MongoDB.Driver, Version=2.2.4.26, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MongoDB.Driver.2.2.4\lib\net45\MongoDB.Driver.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MongoDB.Driver.Core, Version=2.2.4.26, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MongoDB.Driver.Core.2.2.4\lib\net45\MongoDB.Driver.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Management" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Utils\NetworkConnection.cs" />
-    <Compile Include="LeaderElectionTests.cs" />
-    <Compile Include="MsSql\LeaderRepositoryTests.cs" />
-    <Compile Include="MsSql\LeaderConnectionTests.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="LeaderElection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Gaev.LeaderElection.MongoDb\Gaev.LeaderElection.MongoDb.csproj">
-      <Project>{8ddca610-20ed-4f70-bd73-c42131ba5612}</Project>
-      <Name>Gaev.LeaderElection.MongoDb</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Gaev.LeaderElection\Gaev.LeaderElection.csproj">
       <Project>{7a7c81a9-c19b-4413-90b3-ec2ac478e479}</Project>
       <Name>Gaev.LeaderElection</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

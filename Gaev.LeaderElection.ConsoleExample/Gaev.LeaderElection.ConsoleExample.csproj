@@ -50,6 +50,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Gaev.LeaderElection.MongoDb\Gaev.LeaderElection.MongoDb.csproj">
+      <Project>{8ddca610-20ed-4f70-bd73-c42131ba5612}</Project>
+      <Name>Gaev.LeaderElection.MongoDb</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Gaev.LeaderElection\Gaev.LeaderElection.csproj">
       <Project>{7a7c81a9-c19b-4413-90b3-ec2ac478e479}</Project>
       <Name>Gaev.LeaderElection</Name>

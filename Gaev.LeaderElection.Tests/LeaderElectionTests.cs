@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Gaev.LeaderElection.Tests.Utils;
 using NUnit.Framework;
 
 namespace Gaev.LeaderElection.Tests
@@ -10,6 +11,7 @@ namespace Gaev.LeaderElection.Tests
     [TestFixture("Mutex")]
     [TestFixture("File")]
     [TestFixture("MsSql")]
+    [TestFixture("MongoDb")]
     public class LeaderElectionTests
     {
         private readonly string _leaderElectionType;
@@ -25,10 +27,44 @@ namespace Gaev.LeaderElection.Tests
         {
             // Given
             var app = Guid.NewGuid().ToString();
-            var nodes = Enumerable.Range(1, 5).Select(i => NewNode(app)).ToList();
+            var nodes = Enumerable.Range(1, 3).Select(i => NewNode(app)).ToList();
             await Task.WhenAll(nodes.Select(e => e.Start()));
 
             // When
+            var leaderNodes = nodes.Where(e => e.IsLeader).ToArray();
+
+            // Then
+            Assert.AreEqual(1, leaderNodes.Length);
+        }
+
+        [Test]
+        public async Task ElectionMustFindNewLeaderAfterKillingCurrentOne()
+        {
+            // Given
+            var app = Guid.NewGuid().ToString();
+            var nodes = Enumerable.Range(1, 3).Select(i => NewNode(app)).ToList();
+            await Task.WhenAll(nodes.Select(e => e.Start()));
+            nodes.FirstOrDefault(e => e.IsLeader)?.Kill();
+
+            // When
+            await Task.WhenAny(nodes.Select(e => e.WaitForLeader()));
+            var leaderNodes = nodes.Where(e => e.IsLeader).ToArray();
+
+            // Then
+            Assert.AreEqual(1, leaderNodes.Length);
+        }
+
+        [Test]
+        public async Task ElectionMustFindNewLeaderAfterLeavingOfCurrent()
+        {
+            // Given
+            var app = Guid.NewGuid().ToString();
+            var nodes = Enumerable.Range(1, 3).Select(i => NewNode(app)).ToList();
+            await Task.WhenAll(nodes.Select(e => e.Start()));
+            nodes.FirstOrDefault(e => e.IsLeader)?.Stop();
+
+            // When
+            await Task.WhenAny(nodes.Select(e => e.WaitForLeader()));
             var leaderNodes = nodes.Where(e => e.IsLeader).ToArray();
 
             // Then
@@ -58,6 +94,7 @@ namespace Gaev.LeaderElection.Tests
         private readonly string _node;
         public bool IsLeader { get; private set; }
         private Process _process;
+        private TaskCompletionSource<string> _onOutputAppeared;
 
         public Node(string leaderElectionType, string app, string node)
         {
@@ -76,13 +113,14 @@ namespace Gaev.LeaderElection.Tests
                     Arguments = $"{_app} {_node} {_leaderElectionType}",
                     //                    WindowStyle = ProcessWindowStyle.Minimized,
                     UseShellExecute = false,
+                    RedirectStandardInput = true,
                     RedirectStandardOutput = true,
                     CreateNoWindow = true
                 }
             };
             _process.Start();
 
-            var onStarted = new TaskCompletionSource<object>();
+            _onOutputAppeared = new TaskCompletionSource<string>();
             Task.Run(async () =>
             {
                 while (true)
@@ -90,23 +128,36 @@ namespace Gaev.LeaderElection.Tests
                     if (_process == null) return;
                     while (!_process.StandardOutput.EndOfStream)
                     {
-                        IsLeader = (_process.StandardOutput.ReadLine() == "MASTER");
-                        onStarted.SetResult(null);
+                        var output = _process.StandardOutput.ReadLine();
+                        IsLeader = (output == "MASTER");
+                        _onOutputAppeared.SetResult(output);
                     }
                     await Task.Delay(50);
                 }
             });
-            return onStarted.Task;
+            return _onOutputAppeared.Task;
+        }
+
+        public async Task WaitForLeader()
+        {
+            while (true)
+            {
+                if (IsLeader) return;
+                _onOutputAppeared = new TaskCompletionSource<string>();
+                await _onOutputAppeared.Task;
+            }
         }
 
         public void Kill()
         {
-            _process.Kill();
+            IsLeader = false;
+            Dispose();
         }
 
         public void Stop()
         {
             _process.StandardInput.WriteLine("c");
+            IsLeader = false;
         }
 
         public void Dispose()
@@ -115,7 +166,8 @@ namespace Gaev.LeaderElection.Tests
             _process = null;
             if (process != null)
             {
-                process.Kill();
+                if (!process.HasExited)
+                    process.Kill();
                 process.Dispose();
             }
         }

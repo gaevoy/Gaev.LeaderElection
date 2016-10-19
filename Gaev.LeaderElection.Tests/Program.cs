@@ -21,7 +21,10 @@ namespace Gaev.LeaderElection.Tests
                     election = new File.LeaderElection();
                     break;
                 case "MsSql":
-                    election = new LeaderElection.MsSql.LeaderElection(ConfigurationManager.ConnectionStrings["Main"].ConnectionString);
+                    election = new LeaderElection.MsSql.LeaderElection(ConfigurationManager.ConnectionStrings["Sql"].ConnectionString);
+                    break;
+                case "MongoDb":
+                    election = new MongoDb.LeaderElection(ConfigurationManager.ConnectionStrings["Mongo"].ConnectionString);
                     break;
                 default:
                     throw new NotImplementedException();

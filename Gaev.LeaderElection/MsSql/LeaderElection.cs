@@ -43,6 +43,7 @@ namespace Gaev.LeaderElection.MsSql
         {
             if (cancellationToken.IsCancellationRequested) return;
 
+            bool? isLeader = null;
             string prevLeaderNode = null;
             LeaderDto leader = new LeaderDto { App = app, Node = node };
             while (true)
@@ -56,11 +57,12 @@ namespace Gaev.LeaderElection.MsSql
                 {
                     leader.Node = null; // Set to null because it is unknown whether it is still leader.
                 }
-
-                if (prevLeaderNode != leader.Node)
+                bool isStillLeader = leader.Node == node;
+                if (isLeader != isStillLeader || prevLeaderNode != leader.Node)
                 {
+                    isLeader = isStillLeader;
                     prevLeaderNode = leader.Node;
-                    onLeaderChanged(new Leader { App = app, Node = leader.Node, AmILeader = node == leader.Node });
+                    onLeaderChanged(new Leader { App = app, Node = leader.Node, AmILeader = isStillLeader });
                 }
                 if (await TaskExt.Delay(_renewPeriodMilliseconds, cancellationToken))
                 {

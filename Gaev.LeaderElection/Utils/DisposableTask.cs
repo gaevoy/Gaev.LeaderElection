@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Gaev.LeaderElection.Utils
 {
-    internal class DisposableTask : IDisposable
+    public class DisposableTask : IDisposable
     {
         private readonly Task _task;
         private readonly CancellationTokenSource _cancellationToken;

@@ -12,6 +12,7 @@ namespace Gaev.LeaderElection.File
     /// </summary>
     public class LeaderElection : ILeaderElection
     {
+        // TODO: Current implementation can elect several leaders if lock-file is placed on networks share and network drops appears
         private readonly List<IDisposable> _tasks = new List<IDisposable>();
         private readonly string _locksDirectory;
 
